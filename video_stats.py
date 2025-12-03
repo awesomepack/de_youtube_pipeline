@@ -1,18 +1,39 @@
 import requests
-from secrets import yt_key
 import json
+import os
+from dotenv import load_dotenv
 
+load_dotenv(dotenv_path="./.env")
 
-#Build the url for the get request
+YT_API_KEY = os.getenv("YT_API_KEY")
 part = 'ContentDetails'
 forHandle = 'MrBeast'
-url = f'https://youtube.googleapis.com/youtube/v3/channels?part={part}&forHandle={forHandle}&key={yt_key}'
+
+def get_playlist_id():
+
+    try:
+        
+        #Build the url for the request
+     
+
+        url = f'https://youtube.googleapis.com/youtube/v3/channels?part={part}&forHandle={forHandle}&key={YT_API_KEY}'
 
 
-#response = requests.get(url)
+        response = requests.get(url)
 
-# print(response)
+        response.raise_for_status()
 
-# data = response.json()
+        data = response.json()
 
-# json.dumps(data , indent = 4)
+        channel_items = data['items'][0]
+        channel_playlistId = channel_items['contentDetails']['relatedPlaylists']['uploads']
+
+        print(channel_playlistId)
+        return channel_playlistId
+    
+    except requests.exceptions.RequestException as e:
+        raise e
+
+if __name__ == "__main__":
+    get_playlist_id()
+
