@@ -3,15 +3,23 @@ import json
 import os
 from dotenv import load_dotenv
 
+#Load environment variables 
 load_dotenv(dotenv_path="./.env")
 
+#Access .env variables
 YT_API_KEY = os.getenv("YT_API_KEY")
+
 part = 'ContentDetails'
 forHandle = 'MrBeast'
 maxResults = 50
 
 
 def get_playlist_id():
+    '''
+    Docstring for get_playlist_id
+    (str) , (str) --> (str)
+    Requests playlist id from youtube API V3 using supplied part and foHandle and returns the matching playlist id
+    '''
 
     try:
         
@@ -23,6 +31,7 @@ def get_playlist_id():
 
         response = requests.get(url)
 
+        #Raises HTTP error if code begins with 4 or 5
         response.raise_for_status()
 
         data = response.json()
@@ -30,7 +39,7 @@ def get_playlist_id():
         channel_items = data['items'][0]
         channel_playlistId = channel_items['contentDetails']['relatedPlaylists']['uploads']
 
-        print(channel_playlistId)
+        
         return channel_playlistId
     
     except requests.exceptions.RequestException as e:
@@ -39,6 +48,13 @@ def get_playlist_id():
  
 
 def get_video_ids(playlistId):
+    '''
+    Docstring for get_video_ids
+    (str) --> (list)
+    Loops through response from youtube api v3 50 results at at a time
+    
+    :param playlistId: string produced by get_playlist_id
+    '''
     video_ids = []
     pageToken =  None
     base_url =  f'https://youtube.googleapis.com/youtube/v3/playlistItems?part=ContentDetails&maxResults={maxResults}&playlistId={playlistId}&key={YT_API_KEY}'
@@ -72,24 +88,35 @@ def get_video_ids(playlistId):
         raise e
 
 
-# Define helper function to split video id's into batches
-
-
-
-
-
 
 def extract_video_data(video_ids):
+    '''
+    Docstring for extract_video_data
+    (List) --> (List of Dictionaries)
+    
+    :param video_ids: (List) of video_ids from get_video_ids
+    '''
 
     extracted_data = []
 
+
+    #Helper function to create batches of video ids
     def batch_list(video_id_list , batch_size):
+        '''
+        Docstring for batch_list
+        (List) -- > (List)
+        Generates a list of videoids according to maxResults
+        
+        :param video_id_list: (List) Video ids from  get_video_ids
+        :param batch_size: The desired size of the generated list
+        '''
 
         for video_id in range(0 , len(video_id_list) , batch_size):
 
             yield video_id_list[video_id: video_id + batch_size]
 
     try:
+        #Loop through each batch formed from batch list 
         for batch in batch_list(video_ids , maxResults):
             video_ids_str = ",".join(batch)
 
@@ -101,12 +128,15 @@ def extract_video_data(video_ids):
 
             data = response.json()
 
+            #Loop through response from batch of video ids
             for item in data.get('items' , []):
                 video_id = item['id']
                 snippet = item['snippet']
                 contentDetails = item['contentDetails']
                 statistics = item['statistics']
-            
+
+                #Store individual video data\
+
                 video_data = {
                     'video_id': video_id ,
                     'title': snippet['title'],
