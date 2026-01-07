@@ -79,3 +79,5 @@ def get_video_ids(cur , schema):
     ids = cur.fetchall()
 
     video_ids = [row["Video_ID"] for row  in ids]
+
+    return video_ids
