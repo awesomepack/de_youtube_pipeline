@@ -43,7 +43,8 @@ def insert_rows(cur , conn , schema , row):
     
     # Update existing rows
 
-    def update_rows(cur , conn , schema , row):
+def update_rows(cur , conn , schema , row):
+        
         try:
             # Staging
             if schema == 'staging':
@@ -84,7 +85,8 @@ def insert_rows(cur , conn , schema , row):
         
 
         # Delete videos that have been removed from the channel
-        def delet_rows(cur , conn , schema , ids_to_del):
+def delete_rows(cur , conn , schema , ids_to_del):
+            
             try:
                 ids_to_delete = f"""({' , '.join(f"'{id}'" for id in ids_to_delete)})"""
 

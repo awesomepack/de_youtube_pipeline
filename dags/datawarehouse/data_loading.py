@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 # Defining function to open json file and parsing it into a python object
-def load_path():
+def load_data():
 
     file_path = f"./data/YT_data_{date.today()}"
 
