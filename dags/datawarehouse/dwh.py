@@ -6,7 +6,7 @@ from datawarehouse.data_transformations import transform_data
 import logging
 from airflow.decorators import task
 
-logger = logging.getlogger(__name__)
+logger = logging.getLogger(__name__)
 table = "yt_api"
 
 # Populating the staging table
@@ -31,10 +31,14 @@ def staging_table():
         for row in YT_data:
 
             if len(table_ids) == 0:
-                update_rows(cur , conn , schema , row)
+                insert_rows(cur , conn , schema , row)
             
             else:
-                insert_rows(cur , conn,schema , row)
+                if row["Video_id"] in table_ids:
+                    update_rows(cur , conn , schema, row)
+                
+                else:
+                    insert_rows(cur , conn , schema , row)
 
         ids_in_json =  {row['video_id'] for row in YT_data}
 

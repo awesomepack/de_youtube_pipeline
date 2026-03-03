@@ -3,3 +3,4 @@ __pycache__/
 YT_ElT.code-workspace
 .env
 logs/
+notebook.ipynb
